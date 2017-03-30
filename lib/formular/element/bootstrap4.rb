@@ -17,11 +17,10 @@ module Formular
         set_default :type, 'submit'
       end # class Submit
 
-      # TODO: this probably just an icon
-      class Error < Formular::Element::Error
+      class ErrorIcon < Formular::Element::ErrorIcon
         tag :span
         set_default :class, ['form-control-feedback']
-      end # class Error
+      end # class ErrorIcon
 
       class Hint < Formular::Element::Small
         set_default :class, ['text-muted']
@@ -46,22 +45,23 @@ module Formular
         set_default :class, ['form-group', 'has-feedback', 'has-error', 'has-danger']
       end # class Wrapper
 
-      # # TODO: add this in element and make sure the error message goes in a <li> under the <ul>
       class HelpBlock < Formular::Element::HelpBlock
-        include Formular::Element::Modules::WrappedControl
-        
+        # include Formular::Element::Modules::WrappedControl
+
         tag :div
         set_default :class, ['help-block', 'with-errors']
       end #class HelpBlock
 
       class ListErrors < Formular::Element::ListErrors
+        include Formular::Element::Modules::WrappedControl
+
         tag :ul
         set_default :class, ['list-unstyled']
       end #class ListErros
 
-      # class Error < Formular::Element::Error
-      #   tag :li
-      # end
+      class Error < Formular::Element::Error
+        tag :li
+      end # class Error
 
     end # module Bootstrap3
   end # class Element

@@ -80,6 +80,8 @@ module Formular
 
     def define_html_blocks
       self.class.html_blocks.each_with_object({}) do |(context, block), hash|
+        puts context.inspect
+        puts block.inspect
         hash[context] = HtmlBlock.new(self, block)
       end
     end

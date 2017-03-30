@@ -122,6 +122,21 @@ module Formular
       set_default :content, :error_text
     end # class Error
 
+    class HelpBlock < Container
+      tag :div
+      set_default :class, ['help-block','with-errors']
+    end # class HelpBlock
+
+    class ListErrors < Container
+      tag :ul
+      set_default :class, ['list_unstiled']
+    end # class ListErrors
+
+    class ErrorIcon < Container
+      tag :span
+      set_default :class, ['form-control-feedback']
+    end # class ErrorIcon
+
     class Textarea < Control
       include Formular::Element::Modules::Container
       tag :textarea
@@ -303,15 +318,6 @@ module Formular
       html { closed_start_tag }
     end # class Radio
 
-    class HelpBlock < Container
-      tag :div
-
-      set_default :class, ['help-block','with-errors']
-    end
-
-    class ListErrors < Container
-      
-    end
 
   end # class Element
 end # module Formular

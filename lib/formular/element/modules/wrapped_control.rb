@@ -47,6 +47,7 @@ module Formular
             return '' unless has_errors?
 
             error_options[:content] = error_text
+            puts error_options.inspect
             builder.error(error_options).to_s
           end
 

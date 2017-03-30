@@ -31,7 +31,8 @@ module Formular
         submit: Formular::Element::Bootstrap4::Submit,
         row: Formular::Element::Bootstrap3::Row,
         help_block: Formular::Element::Bootstrap4::HelpBlock,
-        list_errors: Formular::Element::Bootstrap4::ListErrors
+        list_errors: Formular::Element::Bootstrap4::ListErrors,
+        error_icon: Formular::Element::Bootstrap4::ErrorIcon
       )
     end # class Bootstrap4
   end # module Builders

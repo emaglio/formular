@@ -15,7 +15,7 @@ describe Formular::Element::Bootstrap4 do
     it "tring this" do
       element = builder.help_block(error: "test")
       element.to_s.must_equal ""
-      
+
     end
   end
 end
