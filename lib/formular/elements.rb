@@ -302,5 +302,16 @@ module Formular
 
       html { closed_start_tag }
     end # class Radio
+
+    class HelpBlock < Container
+      tag :div
+
+      set_default :class, ['help-block','with-errors']
+    end
+
+    class ListErrors < Container
+      
+    end
+
   end # class Element
 end # module Formular
