@@ -46,22 +46,21 @@ module Formular
       end # class Wrapper
 
       class HelpBlock < Formular::Element::HelpBlock
-        # include Formular::Element::Modules::WrappedControl
-
         tag :div
         set_default :class, ['help-block', 'with-errors']
       end #class HelpBlock
 
       class ListErrors < Formular::Element::ListErrors
-        include Formular::Element::Modules::WrappedControl
-
         tag :ul
-        set_default :class, ['list-unstyled']
+        set_default :class, ['list-unstyled', 'h6', 'text-left']
       end #class ListErros
 
-      class Error < Formular::Element::Error
+      class ErrorText < Formular::Element::ErrorText
         tag :li
-      end # class Error
+      end # class ErrorText
+
+      class Error < Formular::Element::Error
+      end# class Error
 
     end # module Bootstrap3
   end # class Element

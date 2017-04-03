@@ -18,6 +18,7 @@ module Formular
 
         add_option_keys :content
 
+
         html do |element|
           concat start_tag
           concat element.content

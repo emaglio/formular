@@ -23,6 +23,18 @@ module Formular
     Span = Class.new(Container) { tag :span }
     Small = Class.new(Container) { tag :small }
 
+    module GetError
+      @@error = ''
+
+      def self.set(error_text)
+        @@error = error_text
+      end
+
+      def self.get
+        @@error
+      end
+    end
+
     class Hidden < Control
       tag :input
       set_default :type, 'hidden'
@@ -116,26 +128,43 @@ module Formular
       end
     end
 
-    class Error < P
+    class Error < Container
       include Formular::Element::Modules::Error
       add_option_keys :attribute_name
       set_default :content, :error_text
+
+      html do |element|
+        GetError::set(element.content)
+        concat element.error_icon
+        concat element.help_block
+      end
     end # class Error
 
     class HelpBlock < Container
-      tag :div
-      set_default :class, ['help-block','with-errors']
+      html do |element|
+        concat start_tag
+        concat element.list_errors
+        concat end_tag
+      end
     end # class HelpBlock
-
-    class ListErrors < Container
-      tag :ul
-      set_default :class, ['list_unstiled']
-    end # class ListErrors
 
     class ErrorIcon < Container
       tag :span
       set_default :class, ['form-control-feedback']
     end # class ErrorIcon
+
+    class ListErrors < Container
+      html do |element|
+        concat start_tag
+        concat element.error_text(content: GetError.get)
+        concat end_tag
+      end
+    end # class ListErrors
+
+
+    class ErrorText < Container
+
+    end # class ErrorText
 
     class Textarea < Control
       include Formular::Element::Modules::Container
@@ -317,7 +346,6 @@ module Formular
 
       html { closed_start_tag }
     end # class Radio
-
 
   end # class Element
 end # module Formular

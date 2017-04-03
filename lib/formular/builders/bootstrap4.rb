@@ -30,9 +30,10 @@ module Formular
         error_wrapper: Formular::Element::Bootstrap4::ErrorWrapper,
         submit: Formular::Element::Bootstrap4::Submit,
         row: Formular::Element::Bootstrap3::Row,
-        help_block: Formular::Element::Bootstrap4::HelpBlock,
         list_errors: Formular::Element::Bootstrap4::ListErrors,
-        error_icon: Formular::Element::Bootstrap4::ErrorIcon
+        error_icon: Formular::Element::Bootstrap4::ErrorIcon,
+        error_text: Formular::Element::Bootstrap4::ErrorText,
+        help_block: Formular::Element::Bootstrap4::HelpBlock
       )
     end # class Bootstrap4
   end # module Builders
