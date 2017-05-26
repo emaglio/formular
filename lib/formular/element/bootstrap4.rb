@@ -17,10 +17,6 @@ module Formular
         set_default :type, 'submit'
       end # class Submit
 
-      class ErrorIcon < Formular::Element::ErrorIcon
-        tag :span
-        set_default :class, ['form-control-feedback']
-      end # class ErrorIcon
 
       class Hint < Formular::Element::Small
         set_default :class, ['text-muted']
@@ -52,7 +48,7 @@ module Formular
 
       class ListErrors < Formular::Element::ListErrors
         tag :ul
-        set_default :class, ['list-unstyled', 'h6', 'text-left']
+        set_default :class, ['list-unstyled']
       end #class ListErros
 
       class ErrorText < Formular::Element::ErrorText
@@ -62,6 +58,10 @@ module Formular
       class Error < Formular::Element::Error
       end# class Error
 
-    end # module Bootstrap3
+      class ErrorIcon < Formular::Element::ErrorIcon
+        tag :span
+        set_default :class, ['form-control-feedback']
+      end # class ErrorIcon
+    end # module Bootstrap4
   end # class Element
 end # module Formular

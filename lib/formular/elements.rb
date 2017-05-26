@@ -23,6 +23,7 @@ module Formular
     Span = Class.new(Container) { tag :span }
     Small = Class.new(Container) { tag :small }
 
+    # TODO(emaglio): need to fix this!
     module GetError
       @@error = ''
 
@@ -135,7 +136,7 @@ module Formular
 
       html do |element|
         GetError::set(element.content)
-        concat element.error_icon
+        # concat element.error_icon
         concat element.help_block
       end
     end # class Error
@@ -147,11 +148,6 @@ module Formular
         concat end_tag
       end
     end # class HelpBlock
-
-    class ErrorIcon < Container
-      tag :span
-      set_default :class, ['form-control-feedback']
-    end # class ErrorIcon
 
     class ListErrors < Container
       html do |element|
