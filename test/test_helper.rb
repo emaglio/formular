@@ -7,3 +7,6 @@ Reply   = Struct.new(:id, :content, :errors)
 Owner   = Struct.new(:id, :name, :email, :errors)
 COLLECTION_ARRAY = [['Option 1', 1], ['Option 2', 2]]
 
+# Manu test
+User = Struct.new(:id, :firstname, :lastname, :email, :password, :confirm_password, :errors)
+
