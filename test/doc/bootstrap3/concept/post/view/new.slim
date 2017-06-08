@@ -1,0 +1,6 @@
+= form model, "/posts", builder: :bootstrap3, id: :new_post, enctype: 'multipart/form-data' do |f|
+  = f.input :title, label: "Title"
+  = f.input :subtitle, label: "Subtitle"
+  = f.input :body, label: "Write here:"
+  = f.input :image,label: "Post Image", type: "file"
+  = f.submit("Create Post")
