@@ -61,7 +61,7 @@ class TestNewUser < Minitest::Spec
       <div class="form-group">
         <input placeholder="Confirm Password" type="password" name="confirm_password" id="confirm_password" class="form-control"/>
       </div>
-      <button class="btn btn-default" type="submit"></button>
+      <button class="btn btn-default" type="submit">Create User</button>
     </form>
     XML
   }
@@ -87,24 +87,75 @@ class TestNewUser < Minitest::Spec
         <input placeholder="Confirm Password" type="password" name="confirm_password" id="confirm_password" value="" class="form-control"/>
         <span class="help-block">must be filled</span>
       </div>
-      <button class="btn btn-default" type="submit"></button>
+      <button class="btn btn-default" type="submit">Create User</button>
     </form>
     XML
   }
 
+  let(:form_format) { <<-XML
+     <form id="new_user" action="/users" method="post" accept-charset="utf-8">
+      <input name="utf8" type="hidden" value="✓"/>
+    </form>
+    XML
+  }
+
+  let(:input_no_error) { <<-XML
+     <form id="new_user" action="/users" method="post" accept-charset="utf-8">
+      <div class="form-group">
+        <input placeholder="Email" name="email" id="email" value="luca@email.com" type="text" class="form-control"/>
+      </div>
+    </form>
+    XML
+  }
+
+  let(:input_with_error) { <<-XML
+     <form id="new_user" action="/users" method="post" accept-charset="utf-8">
+      <div class="form-group has-error">
+        <input placeholder="Email" name="email" id="email" value="" type="text" class="form-control"/>
+        <span class="help-block">must be filled</span>
+      </div>
+    </form>
+    XML
+  }
+
+  let(:input_password_type) { <<-XML
+     <form id="new_user" action="/users" method="post" accept-charset="utf-8">
+      <div class="form-group">
+        <input placeholder="Password" type="password" name="password" id="password" class="form-control"/>
+      </div>
+    </form>
+    XML
+  }
+
+  let(:submit_button) { <<-XML
+     <form id="new_user" action="/users" method="post" accept-charset="utf-8">
+      <button class="btn btn-default" type="submit">Create User</button>
+    </form>
+    XML
+  }
+
+
+
   it "valid inital rendering" do
     form = User::Contract::New.new(model)
     html = User::Cell::New.new(form).()
-    assert_xml_equal new_form, html
-    #TODO: change this to use test_xml
-    (html.include? "type=\"password\"").must_equal true
+    assert_xml_contain html, form_format
+    assert_xml_contain html, input_no_error
+    assert_not_xml_contain html, input_with_error
+    assert_xml_contain html, input_password_type
+    assert_xml_contain html, submit_button
+    assert_xml_equal html, new_form
   end
 
   it "redering with errors" do
     form = User::Contract::New.new(model)
     form.validate(email: "", password: "", confirm_password: "")
     html = User::Cell::New.new(form).()
-    assert_xml_equal new_form_with_errors, html
+    assert_xml_contain html, form_format
+    assert_xml_contain html, input_with_error
+    assert_not_xml_contain html, input_no_error
+    assert_xml_contain html, submit_button
+    assert_xml_equal html, new_form_with_errors
   end
 end
 

@@ -61,7 +61,7 @@ class TestNewPost < Minitest::Spec
         <label for="image" class="control-label">Post Image</label>
         <input type="file" name="image" id="image" value="path"/>
       </div>
-      <button class="btn btn-default" type="submit"></button>
+      <button class="btn btn-default" type="submit">Create Post</button>
     </form>
     XML
   }
@@ -88,7 +88,52 @@ class TestNewPost < Minitest::Spec
         <input type="file" name="image" id="image" value=""/>
         <span class="help-block">must be filled</span>
       </div>
-      <button class="btn btn-default" type="submit"></button>
+      <button class="btn btn-default" type="submit">Create Post</button>
+    </form>
+    XML
+  }
+
+
+  let(:form_format) { <<-XML
+     <form id="new_post" enctype="multipart/form-data" action="/posts" method="post" accept-charset="utf-8">
+      <input name="utf8" type="hidden" value="&#x2713;"/>
+    </form>
+    XML
+  }
+
+  let(:input_no_error) { <<-XML
+     <form id="new_post" enctype="multipart/form-data" action="/posts" method="post" accept-charset="utf-8">
+      <div class="form-group">
+        <label for="title" class="control-label">Title</label>
+        <input name="title" id="title" value="Formular" type="text" class="form-control"/>
+      </div>
+    </form>
+    XML
+  }
+
+  let(:input_with_error) { <<-XML
+     <form id="new_post" enctype="multipart/form-data" action="/posts" method="post" accept-charset="utf-8">
+      <div class="form-group has-error">
+        <label for="title" class="control-label">Title</label>
+        <input name="title" id="title" value="" type="text" class="form-control"/>
+        <span class="help-block">must be filled</span>
+      </div>
+    </form>
+    XML
+  }
+
+  let(:input_file_type) { <<-XML
+     <form id="new_post" enctype="multipart/form-data" action="/posts" method="post" accept-charset="utf-8">
+      <div class="form-group">
+        <input type="file" name="image" id="image" value="path"/>
+      </div>
+    </form>
+    XML
+  }
+
+  let(:submit_button) { <<-XML
+     <form id="new_post" enctype="multipart/form-data" action="/posts" method="post" accept-charset="utf-8">
+      <button class="btn btn-default" type="submit">Create Post</button>
     </form>
     XML
   }
@@ -96,14 +141,23 @@ class TestNewPost < Minitest::Spec
   it "valid inital rendering" do
     form = Post::Contract::New.new(model)
     html = Post::Cell::New.new(form).()
-    assert_xml_equal new_form, html
+    assert_xml_contain html, form_format
+    assert_xml_contain html, input_no_error
+    assert_not_xml_contain html, input_with_error
+    assert_xml_contain html, input_file_type
+    assert_xml_contain html, submit_button
+    assert_xml_equal html, new_form
   end
 
   it "redering with errors" do
     form = Post::Contract::New.new(model)
     form.validate(title: "", body: "", image: "")
     html = Post::Cell::New.new(form).()
-    assert_xml_equal new_form_with_errors, html
+    assert_xml_contain html, form_format
+    assert_xml_contain html, input_with_error
+    assert_not_xml_contain html, input_no_error
+    assert_xml_contain html, submit_button
+    assert_xml_equal html, new_form_with_errors
   end
 end
 
