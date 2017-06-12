@@ -1,7 +1,9 @@
 = form model, "/users", builder: :bootstrap3, id: :new_user do |f|
   = f.input :firstname, placeholder: "Firstname"
   = f.input :lastname, placeholder: "Lastname"
+  = f.select :gender, collection: [["Male"], ["Female"], ["You"]]
+  = f.input :dob, placeholder: "Date of birth:"
   = f.input :email, placeholder: "Email"
   = f.input :password, placeholder: "Password", type: "password"
   = f.input :confirm_password, placeholder: "Confirm Password", type: "password"
-  = f.submit(value: "Create User")
+  = f.submit(content: "Create User")
