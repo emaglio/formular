@@ -1,6 +1,6 @@
 require 'formular/element'
 require 'formular/elements'
-require 'formular/element/modules/wrapped_control'
+require 'formular/element/modules/wrapped'
 require 'formular/element/module'
 require 'formular/element/bootstrap3/checkable_control'
 require 'formular/element/bootstrap3/column_control'
@@ -66,25 +66,25 @@ module Formular
       end # class Hint
 
       class Input < Formular::Element::Input
-        include Formular::Element::Modules::WrappedControl
+        include Formular::Element::Modules::Wrapped
         include Formular::Element::Bootstrap3::ColumnControl
 
-        set_default :class, ['form-control'], unless: :file_input?
+        set_default :class, :input_class
 
-        def file_input?
-          attributes[:type].to_s == 'file'
+        def input_class
+          'form-control' unless options[:type].to_s == 'file'
         end
       end # class Input
 
       class Select < Formular::Element::Select
-        include Formular::Element::Modules::WrappedControl
+        include Formular::Element::Modules::Wrapped
         include Formular::Element::Bootstrap3::ColumnControl
 
         set_default :class, ['form-control']
       end # class Select
 
       class Textarea < Formular::Element::Textarea
-        include Formular::Element::Modules::WrappedControl
+        include Formular::Element::Modules::Wrapped
         include Formular::Element::Bootstrap3::ColumnControl
 
         set_default :class, ['form-control']

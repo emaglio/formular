@@ -25,9 +25,14 @@ describe 'core elements' do
   end # Formular::Element::Button
 
   describe Formular::Element::Button do
-    it 'returns correct html' do
-      element = Formular::Element::Button.(href: '/some_path', value: 'Button')
-      element.to_s.must_equal %(<button href="/some_path">Button</button>)
+    it '#to_s' do
+      element = Formular::Element::Button.(name: 'my-name', value: 1, content: 'Jimmy')
+      element.to_s.must_equal %(<button name="my-name" value="1">Jimmy</button>)
+    end
+
+    it 'escapes value attribute' do
+      element = Formular::Element::Button.(value: "I'm a little teapot whose spout is > 10cm")
+      element.to_s.must_equal %(<button value="I&#39;m a little teapot whose spout is &gt; 10cm"></button>)
     end
   end # Formular::Element::Button
 
@@ -35,6 +40,11 @@ describe 'core elements' do
     it '#to_s' do
       element = Formular::Element::Submit.(value: 'Submit Button')
       element.to_s.must_equal %(<input value="Submit Button" type="submit"/>)
+    end
+
+    it 'escapes value attribute' do
+      element = Formular::Element::Submit.(value: "I'm a little teapot whose spout is > 10cm")
+      element.to_s.must_equal %(<input value="I&#39;m a little teapot whose spout is &gt; 10cm" type="submit"/>)
     end
   end # Formular::Element::Submit
 
@@ -180,7 +190,37 @@ describe 'core elements' do
       element = Formular::Element::Input.(value: 'Some text')
       element.to_s.must_equal %(<input value="Some text" type="text"/>)
     end
+
+    it 'escapes value attribute' do
+      element = Formular::Element::Input.(value: "I'm a little teapot whose spout is > 10cm")
+      element.to_s.must_equal %(<input value="I&#39;m a little teapot whose spout is &gt; 10cm" type="text"/>)
+    end
   end # Formular::Element::Input
+
+  describe Formular::Element::Hidden do
+    describe 'through builder' do
+      it 'with attribute_name' do
+        element = builder.hidden(:body, value: 'Some text')
+        element.to_s.must_equal %(<input value="Some text" name="body" id="body" type="hidden"/>)
+      end
+
+      it 'without attribute_name' do
+        element = builder.hidden(value: 'Some text')
+        element.to_s.must_equal %(<input value="Some text" type="hidden"/>)
+      end
+    end
+
+    it '#to_s' do
+      element = Formular::Element::Hidden.(value: 'Some text')
+      element.to_s.must_equal %(<input value="Some text" type="hidden"/>)
+    end
+
+    it 'escapes value attribute' do
+      element = Formular::Element::Hidden.(value: "I'm a little teapot whose spout is > 10cm")
+      element.to_s.must_equal %(<input value="I&#39;m a little teapot whose spout is &gt; 10cm" type="hidden"/>)
+    end
+  end # Formular::Element::Hidden
+
 
   describe Formular::Element::Label do
     describe 'through builder' do
@@ -236,12 +276,12 @@ describe 'core elements' do
     describe "with collection" do
       it '#to_s default methods' do
         element = Formular::Element::Checkbox.(name: 'public[]',  collection: [['False', 0], ['True', 1]])
-        element.to_s.must_equal %(<label><input value="0" type="checkbox" name="public[]" id="public_0"/> False</label><label><input value="1" type="checkbox" name="public[]" id="public_1"/> True</label><input value="" name="public[]" type="hidden"/>)
+        element.to_s.must_equal %(<label><input type="checkbox" value="0" name="public[]" id="public_0"/> False</label><label><input type="checkbox" value="1" name="public[]" id="public_1"/> True</label><input value="" name="public[]" type="hidden"/>)
       end
 
       it '#to_s custom methods' do
         element = Formular::Element::Checkbox.(name: 'public[]', collection: [2..4, 3..5], label_method: :min, value_method: :max)
-        element.to_s.must_equal %(<label><input value="4" type="checkbox" name="public[]" id="public_4"/> 2</label><label><input value="5" type="checkbox" name="public[]" id="public_5"/> 3</label><input value="" name="public[]" type="hidden"/>)
+        element.to_s.must_equal %(<label><input type="checkbox" value="4" name="public[]" id="public_4"/> 2</label><label><input type="checkbox" value="5" name="public[]" id="public_5"/> 3</label><input value="" name="public[]" type="hidden"/>)
       end
     end
   end # Formular::Element::Checkbox
@@ -306,13 +346,12 @@ describe 'core elements' do
         Formular::Element::Select.(
           name: 'public',
           collection: [['False', 0], ['True', 1]],
-          value: 0,
           prompt: 'Select an option'
         )
       end
 
       it 'simple array' do
-        element.option_tags.must_equal %(<option value="">Select an option</option><option value="0" selected="selected">False</option><option value="1">True</option>)
+        element.option_tags.must_equal %(<option value="" selected="selected">Select an option</option><option value="0">False</option><option value="1">True</option>)
       end
 
       it 'nested array' do
@@ -322,10 +361,9 @@ describe 'core elements' do
             ['Genders', [%w(Male m), %w(Female f)]],
             ['Booleans', [['True', 1], ['False', 0]]]
           ],
-          value: 'm',
           prompt: 'Select an option'
         )
-        element.option_tags.must_equal %(<option value="">Select an option</option><optgroup label="Genders"><option value="m" selected="selected">Male</option><option value="f">Female</option></optgroup><optgroup label="Booleans"><option value="1">True</option><option value="0">False</option></optgroup>)
+        element.option_tags.must_equal %(<option value="" selected="selected">Select an option</option><optgroup label="Genders"><option value="m">Male</option><option value="f">Female</option></optgroup><optgroup label="Booleans"><option value="1">True</option><option value="0">False</option></optgroup>)
       end
 
       it 'option tag attributes' do
@@ -335,14 +373,27 @@ describe 'core elements' do
             ['Genders', [['Male', 'm', { data: { some_attr: 'yes' } }], %w(Female f)]],
             ['Booleans', [['True', 1, { required: 'true' }], ['False', 0]]]
           ],
+          prompt: 'Select an option'
+        )
+        element.option_tags.must_equal %(<option value="" selected="selected">Select an option</option><optgroup label="Genders"><option data-some-attr="yes" value="m">Male</option><option value="f">Female</option></optgroup><optgroup label="Booleans"><option required="true" value="1">True</option><option value="0">False</option></optgroup>)
+      end
+
+
+      it 'no prompt if value given' do
+        element = Formular::Element::Select.(
+          name: 'public',
+          collection: [
+            ['Genders', [['Male', 'm', { data: { some_attr: 'yes' } }], %w(Female f)]],
+            ['Booleans', [['True', 1, { required: 'true' }], ['False', 0]]]
+          ],
           value: 'm',
           prompt: 'Select an option'
         )
-        element.option_tags.must_equal %(<option value="">Select an option</option><optgroup label="Genders"><option data-some-attr="yes" value="m" selected="selected">Male</option><option value="f">Female</option></optgroup><optgroup label="Booleans"><option required="true" value="1">True</option><option value="0">False</option></optgroup>)
+        element.option_tags.must_equal %(<optgroup label="Genders"><option data-some-attr="yes" value="m" selected="selected">Male</option><option value="f">Female</option></optgroup><optgroup label="Booleans"><option required="true" value="1">True</option><option value="0">False</option></optgroup>)
       end
     end
 
-    describe 'include_blank?' do
+    describe 'include_blank' do
       let(:element) do
         Formular::Element::Select.(
           name: 'public',

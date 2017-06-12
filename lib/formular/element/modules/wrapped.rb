@@ -8,9 +8,9 @@ module Formular
     module Modules
       # include this module to enable an element to render the entire wrapped input
       # e.g. wrapper{label+control+hint+error}
-      module WrappedControl
+      module Wrapped
         include Formular::Element::Module
-        include Control
+#        include Control
         include Hint
         include Error
         include Label
@@ -32,15 +32,16 @@ module Formular
         module InstanceMethods
           def wrapper(&block)
             wrapper_element = has_errors? ? :error_wrapper : :wrapper
-            builder.send(wrapper_element, Attributes[options[:wrapper_options]], &block)
+            builder.send(wrapper_element, wrapper_options, &block)
           end
 
           def label
             return '' unless has_label?
 
-            label_options[:content] = label_text
-            label_options[:labeled_control] = self
-            builder.label(label_options).to_s
+            label_opts = label_options.dup
+            label_opts[:content] = label_text
+            label_opts[:labeled_control] = self
+            builder.label(label_opts).to_s
           end
 
           def error
@@ -52,22 +53,22 @@ module Formular
 
           def hint
             return '' unless has_hint?
-
-            hint_options[:content] = hint_text
-            hint_options[:id] ||= hint_id
-            builder.hint(hint_options).to_s
+            hint_opts = hint_options.dup
+            hint_opts[:content] = hint_text
+            hint_opts[:id] = hint_id # FIXME: this should work like a standard set_default
+            builder.hint(hint_opts).to_s
           end
 
           private
           def error_options
-            @error_options ||= Attributes[options[:error_options]]
+            @error_options ||= options[:error_options] || {}
           end
 
           def wrapper_options
-            @wrapper_options ||= Attributes[options[:wrapper_options]]
+            @wrapper_options ||= options[:wrapper_options] || {}
           end
         end # module InstanceMethods
-      end # module WrappedControl
+      end # module Wrapped
     end # module Modules
   end # class Element
 end # module Formular
