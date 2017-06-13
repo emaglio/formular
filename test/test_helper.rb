@@ -9,8 +9,8 @@ Owner   = Struct.new(:id, :name, :email, :errors)
 COLLECTION_ARRAY = [['Option 1', 1], ['Option 2', 2]]
 
 # Manu test
-User = Struct.new(:id, :firstname, :lastname, :gender, :dob, :email, :password, :confirm_password)
-Post = Struct.new(:id, :title, :subtitle, :body, :image)
+User = Struct.new(:id, :firstname, :lastname, :gender, :dob, :email, :password, :confirm_password, :avatar)
+Post = Struct.new(:id, :title, :subtitle, :body, :user)
 
 def generate_xml(string)
   <<-XML

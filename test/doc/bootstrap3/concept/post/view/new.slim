@@ -1,6 +1,7 @@
-= form model, "/posts", builder: :bootstrap3, id: :new_post, enctype: 'multipart/form-data' do |f|
+= form model, "/posts", builder: :bootstrap3, id: :new_post do |f|
   = f.input :title, label: "Title"
   = f.input :subtitle, label: "Subtitle"
-  = f.input :body, label: "Write here:"
-  = f.input :image,label: "Post Image", type: "file"
+  = f.input :body, label: "Write here:", row: 9
+  = f.nested :user do |user|
+    = user.input :email, disabled: "true"
   = f.submit(content: "Create Post")
