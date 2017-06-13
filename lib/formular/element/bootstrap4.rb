@@ -1,9 +1,10 @@
 require 'formular/element'
 require 'formular/elements'
-require 'formular/element/modules/wrapped_control'
+require 'formular/element/modules/wrapped'
 require 'formular/element/module'
 require 'formular/element/bootstrap4/checkable_control'
 require 'formular/element/bootstrap4/custom_control'
+require 'formular/element/bootstrap3'
 require 'formular/element/bootstrap3/column_control'
 
 module Formular
@@ -18,22 +19,30 @@ module Formular
       end # class Submit
 
       class Error < Formular::Element::Error
-        tag :span
+        tag :div
         set_default :class, ['form-control-feedback']
       end # class Error
 
       class Hint < Formular::Element::Small
-        set_default :class, ['text-muted']
+        set_default :class, ['form-text', 'text-muted']
       end # class Hint
 
-      class Input < Formular::Element::Input
-        include Formular::Element::Modules::WrappedControl
-        include Formular::Element::Bootstrap3::ColumnControl
+      class Select < Formular::Element::Bootstrap3::Select
+        set_default :label_options, { class: ['form-control-label'] }
+      end # class Textarea
 
-        set_default :class, :input_class
+
+      class Textarea < Formular::Element::Bootstrap3::Textarea
+        set_default :label_options, { class: ['form-control-label'] }
+      end # class Textarea
+
+      class Input < Formular::Element::Bootstrap3::Input
+        set_default :label_options, { class: ['form-control-label'] }
 
         def input_class
-          attributes[:type].to_s == 'file' ? %(form-control-file) : %(form-control)
+          return %(form-control-file) if options[:type].to_s == 'file'
+
+          has_errors? ? ['form-control', 'form-control-danger'] : ['form-control']
         end
       end # class Input
 

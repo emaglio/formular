@@ -15,7 +15,6 @@ module Formular
         include Label
 
         add_option_keys :control_label_options
-
         set_default :checked, 'checked', if: :is_checked?
 
         html(:checkable_label) do |input|
@@ -38,8 +37,9 @@ module Formular
         module InstanceMethods
           def group_label
             return '' unless has_group_label?
-            label_options[:content] = label_text
-            builder.checkable_group_label(label_options).to_s
+            label_opts = label_options.dup
+            label_opts[:content] = label_text
+            builder.checkable_group_label(label_opts).to_s
           end
 
           def has_group_label?
@@ -59,10 +59,10 @@ module Formular
               opts[:value] = item.send(options[:value_method])
               opts[:label] = item.send(options[:label_method])
 
-              opts[:id] = if attributes[:id]
-                            "#{attributes[:id]}_#{opts[:value]}"
+              opts[:id] = if options[:id]
+                            "#{options[:id]}_#{opts[:value]}"
                           else
-                            "#{attribute_name || attributes[:name].gsub('[]', '')}_#{opts[:value]}"
+                            "#{attribute_name || options[:name].gsub('[]', '')}_#{opts[:value]}"
                           end
 
               self.class.(opts)
@@ -74,18 +74,17 @@ module Formular
           end
 
           private
-
-          # we can't access other defaults
           def is_checked?
-            !options[:checked].nil? || reader_value == attributes[:value]
+            !options[:checked].nil? || reader_value == options[:value]
           end
 
           def collection_base_options
-            opts = attributes.select { |k, v| ![:name, :id, :checked, :class].include?(k) } #FIXME due to class merging, we'll end up with duplicate classes...
+            opts = attributes.select { |k, v| ![:name, :id, :checked, :class].include?(k) }
+            # FIXME due to class merging, we'll end up with duplicate classes...
             opts[:attribute_name] = attribute_name if attribute_name
             opts[:builder]        = builder if builder
             opts[:label_options]  = options[:control_label_options] if options[:control_label_options]
-            opts[:name]           = attributes[:name] if attributes[:name]
+            opts[:name]           = options[:name] if options[:name] # do we need this??
 
             opts
           end

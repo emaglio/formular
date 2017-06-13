@@ -1,20 +1,21 @@
 require 'formular/element'
 require 'formular/element/module'
 require 'formular/element/modules/container'
-require 'formular/element/modules/wrapped_control'
+require 'formular/element/modules/wrapped'
 require 'formular/element/modules/control'
 require 'formular/element/modules/checkable'
 require 'formular/element/modules/error'
+require 'formular/element/modules/escape_value'
+require 'formular/html_escape'
 
 module Formular
   class Element
     # These three are really just provided for convenience when creating other elements
     Container = Class.new(Formular::Element) { include Formular::Element::Modules::Container }
     Control = Class.new(Formular::Element) { include Formular::Element::Modules::Control }
-    WrappedControl = Class.new(Formular::Element) { include Formular::Element::Modules::WrappedControl }
+    Wrapped = Class.new(Formular::Element) { include Formular::Element::Modules::Wrapped }
 
     # define some base classes to build from or easily use elsewhere
-    Option = Class.new(Container) { tag :option }
     OptGroup = Class.new(Container) { tag :optgroup }
     Fieldset = Class.new(Container) { tag :fieldset }
     Legend = Class.new(Container) { tag :legend }
@@ -22,6 +23,12 @@ module Formular
     P = Class.new(Container) { tag :p }
     Span = Class.new(Container) { tag :span }
     Small = Class.new(Container) { tag :small }
+
+    class Option < Container
+      tag :option
+      include Formular::Element::Modules::EscapeValue
+    end
+
 
     class Hidden < Control
       tag :input
@@ -76,17 +83,17 @@ module Formular
 
       # because this mutates attributes, we have to call this before rendering the start_tag
       def method_tag
-        method = attributes[:method]
+        method = options[:method]
 
         case method
         when /^get$/ # must be case-insensitive, but can't use downcase as might be nil
-          attributes[:method] = 'get'
+          options[:method] = 'get'
           ''
         when /^post$/, '', nil
-          attributes[:method] = 'post'
+          options[:method] = 'post'
           ''
         else
-          attributes[:method] = 'post'
+          options[:method] = 'post'
           Hidden.(value: method, name: '_method').to_s
         end
       end
@@ -126,6 +133,7 @@ module Formular
       include Formular::Element::Modules::Container
       tag :textarea
       add_option_keys :value
+      add_option_keys
 
       def content
         options[:value] || super
@@ -140,12 +148,13 @@ module Formular
       # as per MDN A label element can have both a 'for' attribute and a contained control element,
       # as long as the for attribute points to the contained control element.
       def labeled_control_id
-        return options[:labeled_control].attributes[:id] if options[:labeled_control]
+        return options[:labeled_control].options[:id] if options[:labeled_control]
         return builder.path(options[:attribute_name]).to_encoded_id if options[:attribute_name] && builder
       end
     end # class Label
 
     class Submit < Formular::Element
+      include Formular::Element::Modules::EscapeValue
       tag :input
 
       set_default :type, 'submit'
@@ -153,26 +162,30 @@ module Formular
       html { closed_start_tag }
     end # class Submit
 
-    class Button < Formular::Element::Container
-      tag :button
-      add_option_keys :value
+    class Button < Container
+      include Formular::Element::Modules::Control
 
-      def content
-        options[:value] || super
-      end
+      tag :button
     end # class Button
 
     class Input < Control
+      include HtmlEscape
+
       tag :input
       set_default :type, 'text'
+      process_option :value, :html_escape
+
       html { closed_start_tag }
     end # class Input
 
     class Select < Control
       include Formular::Element::Modules::Collection
+      include HtmlEscape
+
       tag :select
 
       add_option_keys :value, :prompt, :include_blank
+      process_option :collection, :inject_placeholder
 
       html do |input|
         concat start_tag
@@ -199,20 +212,28 @@ module Formular
       #   <option value="0">false</option>
       # </optgroup>
       def option_tags
-        collection = options[:collection]
-
-        first = placeholder
-        collection.unshift(first) if first
-
-        collection_to_options(collection)
+        collection_to_options(options[:collection])
       end
 
       private
+      # same handling as simple form
+      # prompt: a nil value option appears if we have no selected option
+      # include blank: includes our nil value option regardless (useful for optional fields)
+      def inject_placeholder(collection)
+        placeholder = if options[:include_blank]
+                        placeholder_option(options[:include_blank])
+                      elsif options[:prompt] && options[:value].nil?
+                        placeholder_option(options[:prompt])
+                      end
 
-      def placeholder
-        return unless options[:prompt].is_a?(String) || options[:include_blank] == true
+        collection.unshift(placeholder) if placeholder
 
-        [options[:prompt] || "", ""]
+        collection
+      end
+
+      def placeholder_option(value)
+        text = value.is_a?(String) ? html_escape(value) : ""
+        [text, ""]
       end
 
       def collection_to_options(collection)
@@ -271,7 +292,7 @@ module Formular
       def hidden_tag
         return '' unless options[:include_hidden]
 
-        Hidden.(value: options[:unchecked_value], name: attributes[:name]).to_s
+        Hidden.(value: options[:unchecked_value], name: options[:name]).to_s
       end
 
       private

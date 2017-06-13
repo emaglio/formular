@@ -34,7 +34,7 @@ describe Formular::Element::Bootstrap3 do
 
   describe Formular::Element::Bootstrap3::Submit do
     it "#to_s" do
-      element = builder.submit(value: 'Go Go Go!!')
+      element = builder.submit(content: 'Go Go Go!!')
       element.to_s.must_equal %(<button class="btn btn-default" type="submit">Go Go Go!!</button>)
     end
   end
@@ -143,7 +143,7 @@ describe Formular::Element::Bootstrap3 do
 
     it '#error should return the error element for :body' do
       element = builder.error(:body)
-      element.to_s.must_equal %(<span class="help-block">This really isn't good enough!</span>)
+      element.to_s.must_equal %(<span class="help-block">This really isn&#39;t good enough!</span>)
     end
   end
 

@@ -1,5 +1,5 @@
 require 'formular/elements'
-require 'formular/element/modules/wrapped_control'
+require 'formular/element/modules/wrapped'
 require 'formular/element/module'
 
 module Formular
@@ -7,15 +7,14 @@ module Formular
     module Bootstrap4
       module CheckableControl
         class Checkbox < Formular::Element::Checkbox
-          include Formular::Element::Modules::WrappedControl
+          include Formular::Element::Modules::Wrapped
           set_default :class, ['form-check-input']
-          set_default :value, '1' # instead of reader value
 
           html { closed_start_tag }
         end # class Checkbox
 
         class Radio < Formular::Element::Radio
-          include Formular::Element::Modules::WrappedControl
+          include Formular::Element::Modules::Wrapped
           set_default :class, ['form-check-input']
 
           def hidden_tag
@@ -26,6 +25,7 @@ module Formular
         module InlineCheckable
           include Formular::Element::Module
 
+          set_default :label_options, { class: ['form-control-label'] }
           set_default :control_label_options, { class: ['form-check-inline'] }
 
           html(:wrapped) do |input|
@@ -72,6 +72,7 @@ module Formular
             }.join('')
           end
 
+          set_default :label_options, { class: ['form-control-label'] }
           set_default :control_label_options, { class: ['form-check-label'] }
 
           module InstanceMethods
