@@ -1,0 +1,215 @@
+require 'test_helper'
+require 'formular/helper'
+require 'trailblazer/cell'
+require 'cell/slim'
+require 'reform'
+require 'reform/form/dry'
+
+class User::Cell
+  class New < Trailblazer::Cell
+    include Cell::Slim
+    include Formular::Helper
+
+    self.view_paths = ['test/doc/bootstrap4/concept']
+
+    def show
+      render view: :new
+    end
+
+  end
+end
+
+
+module User::Contract
+  class New < Reform::Form
+    feature Reform::Form::Dry
+
+    property :email
+    property :firstname
+    property :lastname
+    property :gender
+    property :dob #TODO: it would be cool to have an icon of this input like a calendar for the datetime-picker
+    property :password, virtual: true
+    property :confirm_password, virtual: true
+    property :avatar
+
+    validation do
+
+      required(:email).filled
+      required(:password).filled
+      required(:confirm_password).filled
+    end
+
+  end
+end
+
+# basic form + password input, select input and file input
+class TestNewUser < Minitest::Spec
+  let(:model) { User.new(1, "Luca", "Rossi", "Male", "01/01/1980", "luca@email.com", "password", "password", "image_path") }
+  let(:new_form) { <<-XML
+    <form id="new_user" enctype="multipart/form-data" action="/users" method="post" accept-charset="utf-8">
+      <input name="utf8" type="hidden" value="✓"/>
+      <fieldset class="form-group">
+        <input placeholder="Firstname" name="firstname" id="firstname" value="Luca" type="text" class="form-control"/>
+      </fieldset>
+      <fieldset class="form-group">
+        <input placeholder="Lastname" name="lastname" id="lastname" value="Rossi" type="text" class="form-control"/>
+      </fieldset>
+      <fieldset class="form-group">
+        <select name="gender" id="gender" class="form-control">
+          <option value="Male" selected="selected">Male</option>
+          <option value="Female">Female</option>
+          <option value="You">You</option>
+        </select>
+      </fieldset>
+      <fieldset class="form-group">
+        <input placeholder="Date of birth:" name="dob" id="dob" value="01/01/1980" type="text" class="form-control"/>
+      </fieldset>
+      <fieldset class="form-group">
+        <input placeholder="Email" name="email" id="email" value="luca@email.com" type="text" class="form-control"/>
+      </fieldset>
+      <fieldset class="form-group">
+        <input placeholder="Password" type="password" name="password" id="password" class="form-control"/>
+      </fieldset>
+      <fieldset class="form-group">
+        <input placeholder="Confirm Password" type="password" name="confirm_password" id="confirm_password" class="form-control"/>
+      </fieldset>
+      <fieldset class="form-group">
+        <label class="form-control-label" for="avatar">Profile image</label>
+        <input type="file" name="avatar" id="avatar" value="image_path" class="form-control-file"/>
+      </fieldset>
+      <button class="btn btn-secondary" type="submit">Create User</button>
+    </form>
+    XML
+  }
+
+  let(:new_form_with_errors) { <<-XML
+    <form id="new_user" enctype="multipart/form-data" action="/users" method="post" accept-charset="utf-8">
+      <input name="utf8" type="hidden" value="✓"/>
+      <fieldset class="form-group">
+        <input placeholder="Firstname" name="firstname" id="firstname" value="Luca" type="text" class="form-control"/>
+      </fieldset>
+      <fieldset class="form-group">
+        <input placeholder="Lastname" name="lastname" id="lastname" value="Rossi" type="text" class="form-control"/>
+      </fieldset>
+      <fieldset class="form-group">
+        <select name="gender" id="gender" class="form-control">
+          <option value="Male" selected="selected">Male</option>
+          <option value="Female">Female</option>
+          <option value="You">You</option>
+        </select>
+      </fieldset>
+      <fieldset class="form-group">
+        <input placeholder="Date of birth:" name="dob" id="dob" value="01/01/1980" type="text" class="form-control"/>
+      </fieldset>
+      <fieldset class="form-group has-danger">
+        <input placeholder="Email" name="email" id="email" value="" type="text" class="form-control form-control-danger"/>
+        <div class="form-control-feedback">must be filled</div>
+      </fieldset>
+      <fieldset class="form-group has-danger">
+        <input placeholder="Password" type="password" name="password" id="password" value="" class="form-control form-control-danger"/>
+        <div class="form-control-feedback">must be filled</div>
+      </fieldset>
+      <fieldset class="form-group has-danger">
+        <input placeholder="Confirm Password" type="password" name="confirm_password" id="confirm_password" value="" class="form-control form-control-danger"/>
+        <div class="form-control-feedback">must be filled</div>
+      </fieldset>
+      <fieldset class="form-group">
+        <label class="form-control-label" for="avatar">Profile image</label>
+        <input type="file" name="avatar" id="avatar" value="image_path" class="form-control-file"/>
+      </fieldset>
+      <button class="btn btn-secondary" type="submit">Create User</button>
+    </form>
+    XML
+  }
+
+  let(:form_format) { <<-XML
+    <form id="new_user" enctype="multipart/form-data" action="/users" method="post" accept-charset="utf-8">
+      <input name="utf8" type="hidden" value="✓"/>
+    </form>
+    XML
+  }
+
+  let(:input_no_error) { <<-XML
+    <form id="new_user" enctype="multipart/form-data" action="/users" method="post" accept-charset="utf-8">
+      <fieldset class="form-group">
+        <input placeholder="Email" name="email" id="email" value="luca@email.com" type="text" class="form-control"/>
+      </fieldset>
+    </form>
+    XML
+  }
+
+  let(:input_with_error) { <<-XML
+    <form id="new_user" enctype="multipart/form-data" action="/users" method="post" accept-charset="utf-8">
+      <fieldset class="form-group has-danger">
+        <input placeholder="Email" name="email" id="email" value="" type="text" class="form-control form-control-danger"/>
+        <div class="form-control-feedback">must be filled</div>
+      </fieldset>
+    </form>
+    XML
+  }
+
+  let(:input_password_type) { <<-XML
+    <form id="new_user" enctype="multipart/form-data" action="/users" method="post" accept-charset="utf-8">
+      <fieldset class="form-group">
+        <input placeholder="Password" type="password" name="password" id="password" class="form-control"/>
+      </fieldset>
+    </form>
+    XML
+  }
+
+  let(:submit_button) { <<-XML
+    <fieldsetorm id="new_user" enctype="multipart/form-data" action="/users" method="post" accept-charset="utf-8">
+      <button class="btn btn-secondary" type="submit">Create User</button>
+    </form>
+    XML
+  }
+
+  let(:select_input) { <<-XML
+    <form id="new_user" enctype="multipart/form-data" action="/users" method="post" accept-charset="utf-8">
+      <fieldset class="form-group">
+        <select name="gender" id="gender" class="form-control">
+          <option value="Male" selected="selected">Male</option>
+          <option value="Female">Female</option>
+          <option value="You">You</option>
+        </select>
+      </fieldset>
+    </form>
+    XML
+  }
+
+    let(:input_file_type_with_label) { <<-XML
+     <form id="new_user" enctype="multipart/form-data" action="/users" method="post" accept-charset="utf-8">
+      <fieldset class="form-group">
+        <label class="form-control-label" for="avatar">Profile image</label>
+        <input type="file" name="avatar" id="avatar" value="image_path" class="form-control-file"/>
+      </fieldset>
+    </form>
+    XML
+  }
+
+  it "valid inital rendering" do
+    form = User::Contract::New.new(model)
+    html = User::Cell::New.new(form).()
+    assert_xml_contain html, form_format
+    assert_xml_contain html, input_no_error
+    assert_not_xml_contain html, input_with_error
+    assert_xml_contain html, input_password_type
+    assert_xml_contain html, submit_button
+    assert_xml_contain html, select_input
+    assert_xml_contain html, input_file_type_with_label
+    assert_xml_equal html, new_form
+  end
+
+  it "redering with errors" do
+    form = User::Contract::New.new(model)
+    form.validate(email: "", password: "", confirm_password: "")
+    html = User::Cell::New.new(form).()
+    assert_xml_contain html, form_format
+    assert_xml_contain html, input_with_error
+    assert_not_xml_contain html, input_no_error
+    assert_xml_contain html, submit_button
+    assert_xml_equal html, new_form_with_errors
+  end
+end
+

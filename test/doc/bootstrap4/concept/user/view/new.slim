@@ -1,0 +1,10 @@
+= form model, "/users", builder: :bootstrap4, id: :new_user, enctype: 'multipart/form-data' do |f|
+  = f.input :firstname, placeholder: "Firstname"
+  = f.input :lastname, placeholder: "Lastname"
+  = f.select :gender, collection: [["Male"], ["Female"], ["You"]]
+  = f.input :dob, placeholder: "Date of birth:"
+  = f.input :email, placeholder: "Email"
+  = f.input :password, placeholder: "Password", type: "password"
+  = f.input :confirm_password, placeholder: "Confirm Password", type: "password"
+  = f.input :avatar, label: "Profile image", type: "file"
+  = f.submit(content: "Create User")

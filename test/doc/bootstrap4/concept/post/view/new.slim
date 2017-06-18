@@ -1,0 +1,7 @@
+= form model, "/posts", builder: :bootstrap4, id: :new_post do |f|
+  = f.input :title, label: "Title"
+  = f.input :subtitle, label: "Subtitle"
+  = f.input :body, label: "Write here:", row: 9
+  = f.nested :user do |user|
+    = user.input :email, disabled: "true"
+  = f.submit(content: "Create Post")
