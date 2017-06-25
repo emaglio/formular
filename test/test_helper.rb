@@ -10,7 +10,8 @@ COLLECTION_ARRAY = [['Option 1', 1], ['Option 2', 2]]
 
 # Manu test
 User = Struct.new(:id, :firstname, :lastname, :gender, :dob, :email, :password, :confirm_password, :avatar)
-Post = Struct.new(:id, :title, :subtitle, :body, :user)
+Post = Struct.new(:id, :title, :subtitle, :body, :user, :opinions)
+Opinion = Struct.new(:id, :body, :weight, :user)
 
 def generate_xml(string)
   <<-XML
