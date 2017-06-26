@@ -1,13 +1,10 @@
-= post.title
-= post.subtitle
-= post.body
-= trb_form_for model, user_post_comments_path(post_id: post.id, id: post.id), method: :post, builder: bootstrap, id: :new_comment do |f|
-  = f.nested :user do |user|
-    = user.input :email, value: current_user.email, type: "hidden"
-  = f.collection :comments do |comment|
-    = comment.textarea :body, rows: 3, placeholder: "Your Comment"
-    = comment.radio :weight, collection: [['Neutral', 0], ['Agreed', 1], ['Not Agreed', 2]]
-  .row
+= form model, "/opinions/create", method: :post, builder: :bootstrap3, id: :new_comment do |f|
+  = f.collection :opinions do |opinion|
+    = opinion.nested :user do |user|
+      = user.input :email, type: "hidden", value: "current_user.email"
+    = opinion.textarea :body, rows: 3, placeholder: "Your Comment"
+    = opinion.radio :weight, collection: [['Neutral', 0], ['Agreed', 1], ['Not Agreed', 2]]
+    = opinion.checkbox :public, label: "Public?"
     = f.submit(content: "Create Comment")
 
 
