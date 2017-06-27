@@ -6,7 +6,7 @@ require 'reform'
 require 'reform/form/dry'
 
 class User::Cell
-  class New < Trailblazer::Cell
+  class NewBootstrap4 < Trailblazer::Cell
     include Cell::Slim
     include Formular::Helper
 
@@ -20,31 +20,8 @@ class User::Cell
 end
 
 
-module User::Contract
-  class New < Reform::Form
-    feature Reform::Form::Dry
-
-    property :email
-    property :firstname
-    property :lastname
-    property :gender
-    property :dob #TODO: it would be cool to have an icon of this input like a calendar for the datetime-picker
-    property :password, virtual: true
-    property :confirm_password, virtual: true
-    property :avatar
-
-    validation do
-
-      required(:email).filled
-      required(:password).filled
-      required(:confirm_password).filled
-    end
-
-  end
-end
-
 # basic form + password input, select input and file input
-class TestNewUser < Minitest::Spec
+class TestNewUserBootstrap4 < Minitest::Spec
   let(:model) { User.new(1, "Luca", "Rossi", "Male", "01/01/1980", "luca@email.com", "password", "password", "image_path") }
   let(:new_form) { <<-XML
     <form id="new_user" enctype="multipart/form-data" action="/users" method="post" accept-charset="utf-8">
@@ -190,7 +167,7 @@ class TestNewUser < Minitest::Spec
 
   it "valid inital rendering" do
     form = User::Contract::New.new(model)
-    html = User::Cell::New.new(form).()
+    html = User::Cell::NewBootstrap4.new(form).()
     assert_xml_contain html, form_format
     assert_xml_contain html, input_no_error
     assert_not_xml_contain html, input_with_error
@@ -204,7 +181,7 @@ class TestNewUser < Minitest::Spec
   it "redering with errors" do
     form = User::Contract::New.new(model)
     form.validate(email: "", password: "", confirm_password: "")
-    html = User::Cell::New.new(form).()
+    html = User::Cell::NewBootstrap4.new(form).()
     assert_xml_contain html, form_format
     assert_xml_contain html, input_with_error
     assert_not_xml_contain html, input_no_error

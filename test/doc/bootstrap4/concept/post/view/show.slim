@@ -1,0 +1,11 @@
+= form model, "/opinions/create", method: :post, builder: :bootstrap4, id: :new_comment do |f|
+  = f.collection :opinions do |opinion|
+    = opinion.nested :user do |user|
+      = user.input :email, type: "hidden", value: "current_user.email"
+    = opinion.textarea :body, rows: 3, placeholder: "Your Comment"
+    = opinion.radio :weight, collection: [['Neutral', 0], ['Agreed', 1], ['Not Agreed', 2]]
+    = opinion.checkbox :public, label: "Public?"
+    = f.submit(content: "Create Comment")
+
+
+

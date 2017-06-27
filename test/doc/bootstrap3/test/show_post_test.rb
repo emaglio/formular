@@ -2,11 +2,9 @@ require 'test_helper'
 require 'formular/helper'
 require 'trailblazer/cell'
 require 'cell/slim'
-require 'reform'
-require 'reform/form/dry'
 
 class Post::Cell
-  class Show < Trailblazer::Cell
+  class ShowBootstrap3 < Trailblazer::Cell
     include Cell::Slim
     include Formular::Helper
 
@@ -20,39 +18,8 @@ class Post::Cell
 end
 
 
-module Post::Contract
-  class Show < Reform::Form
-    feature Reform::Form::Dry
-
-    collection :opinions,
-      prepopulator: ->(options) {self.opinions = [Opinion.new] },
-      populator: :populate_opinions! do
-        property :body
-        property :weight
-        property :public
-        validation do
-          required(:body).filled
-          required(:weight).filled
-        end
-      property :user, prepopulator: ->(options) { self.user = options[:user] } do
-        property :email
-      end
-    end
-
-  private
-    def populate_opinions!(collection:, index:, **)
-      if item = collection[index]
-        item
-      else
-        collection.insert(index, Opinion.new)
-      end
-    end
-  end
-end
-
-
 #this is good to show how to have nested form + hidden input + radio and checkbox input
-class TestShowPost < Minitest::Spec
+class TestShowPostBootstrap3 < Minitest::Spec
   let(:user) { User.new(1, "Luca", "Rossi", "Male", "01/01/1980", "luca@email.com", "password", "password", "image_path") }
   let(:model) { Post.new(1, "Formular", "Subtitle", "I'm telling you what Formular is", user, []) }
   let(:new_form) { <<-XML
@@ -193,7 +160,7 @@ class TestShowPost < Minitest::Spec
   it "valid inital rendering" do
     form = Post::Contract::Show.new(model)
     form.prepopulate!(user: user)
-    html = Post::Cell::Show.new(form).()
+    html = Post::Cell::ShowBootstrap3.new(form).()
     assert_xml_contain html, form_format
     assert_xml_contain html, nested_input_no_error
     assert_not_xml_contain html, nested_input_with_error
@@ -207,7 +174,7 @@ class TestShowPost < Minitest::Spec
     form = Post::Contract::Show.new(model)
     form.prepopulate!(user: user)
     form.validate(body: "", weight: "")
-    html = Post::Cell::Show.new(form).()
+    html = Post::Cell::ShowBootstrap3.new(form).()
     assert_xml_contain html, form_format
     assert_xml_contain html, nested_input_with_error
     assert_xml_contain html, submit_button
