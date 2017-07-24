@@ -21,9 +21,26 @@ class Erb < Minitest::Spec
   describe 'valid, initial rendering' do
     let(:model) { Comment.new(1, nil, [Reply.new(1, 'some exciting words'), Reply.new], Owner.new(1, 'Joe Blog', 'joe@somewhere.com'), '0x', true) }
 
+    let(:new_comment) { <<-XML
+      <div>New</div>
+      <form action="/posts" method="post" accept-charset="utf-8">
+        <input name="utf8" type="hidden" value="✓"/>
+        <input name="comment[id]" id="comment_id" value="1" type="text"/>
+        <textarea name="comment[body]" id="comment_body">Nice!</textarea>
+        <input value="0" name="comment[public]" type="hidden"/><input value="true" name="comment[public]" id="comment_public" type="checkbox" checked="checked"/>
+        <input name="comment[replies][][content]" id="comment_replies_0_content" value="some exciting words" type="text"/>
+        <input name="comment[replies][][content]" id="comment_replies_1_content" type="text"/>
+        <input name="comment[owner][name]" id="comment_owner_name" value="Joe Blog" type="text"/>
+        <input name="comment[owner][email]" id="comment_owner_email" value="joe@somewhere.com" type="text"/>
+        <input name="comment[uuid]" id="comment_uuid" value="0x" type="text"/>
+        <input value="Submit" type="submit"/>
+      </form>
+      XML
+    }
+
     it do
-      Comment::Erb::Show.new(model).().must_equal %(<div>New</div>
-<form action="/posts" method="post" accept-charset="utf-8"><input name="utf8" type="hidden" value="✓"/><input name="comment[id]" id="comment_id" value="1" type="text"/><textarea placeholder="And your story..." rows="9" name="comment[body]" id="comment_body"></textarea><input value="0" name="comment[public]" type="hidden"/><input value="true" name="comment[public]" id="comment_public" type="checkbox" checked="checked"/><input name="comment[replies][][content]" id="comment_replies_0_content" value="some exciting words" type="text"/><input name="comment[replies][][content]" id="comment_replies_1_content" type="text"/><input name="comment[owner][name]" id="comment_owner_name" value="Joe Blog" type="text"/><input name="comment[owner][email]" id="comment_owner_email" value="joe@somewhere.com" type="text"/><input name="comment[uuid]" id="comment_uuid" value="0x" type="text"/><input value="Submit" type="submit"/></form>)
+      form = Comment::Erb::Show.new(model).()
+      assert_xml_equal form, new_comment
     end
   end
 end

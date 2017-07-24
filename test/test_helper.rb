@@ -1,6 +1,7 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'formular'
 require 'minitest/autorun'
+require 'test_xml/mini_test'
 
 Comment = Struct.new(:id, :body, :replies, :owner, :uuid, :public, :errors) # TODO: remove errors!
 Reply   = Struct.new(:id, :content, :errors)
